@@ -2,7 +2,6 @@
 var APP = 
 	React.createClass({displayName: 'APP',
 		componentWillReceiveProps: function(nextProps) {
-			console.log(nextProps);
 			if (nextProps.data) {
 				this.renderChart(nextProps.data)
 			}

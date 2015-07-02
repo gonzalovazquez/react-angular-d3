@@ -13,7 +13,7 @@
 	</style>
 </head>
 <body ng-app="RNG">
-	<div ng-controller="chartController">
+	<div>
 		<react-chart id="rChart"></react-chart>
 	</div>
 	<div id="app"></div>
@@ -23,12 +23,6 @@
 	<script src="js/app.js"></script>
 	<script>
 		angular.module('RNG', [])
-			.controller('chartController', ['$http','$scope', function($http, $scope){
-				$http.jsonp('http://filltext.com/?rows=10&val={number}&callback=JSON_CALLBACK')
-				.success(function(d) {
-					$scope.data = d;
-				})
-			}])
 			.service('chartService', ['$http', function($http){
 				function getRows() {
 					return $http({
@@ -46,7 +40,6 @@
 				return {
 					restrict: 'EA',
 					scope: {
-						data: '=',
 						id: '@'
 					},
 					link: function(scope, elem) {
@@ -55,7 +48,6 @@
 						});
 
 						scope.$watch('data', function(newData, oldData) {
-							console.log(newData, oldData);
 							React.render(
 								React.createElement(APP, {data: scope.data, target: scope.id}), elem[0]
 							);
