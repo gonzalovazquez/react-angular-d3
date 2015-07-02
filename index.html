@@ -12,12 +12,57 @@
 	}
 	</style>
 </head>
-<body>
+<body ng-app="RNG">
+	<div ng-controller="chartController">
+		<react-chart id="rChart"></react-chart>
+	</div>
 	<div id="app"></div>
-	<script src="/bower_components/react/react.min.js"></script>
-	<script src="/bower_components/react/JSXTransformer.js"></script>
-	<script src="/bower_components/reqwest/reqwest.js"></script>
-	<script src="/bower_components/d3/d3.min.js"></script>
-	<script type="text/jsx" src="jsx/app.js"></script>
+	<script src="/bower_components/react/react.js"></script>
+	<script src="/bower_components/angular/angular.js"></script>
+	<script src="/bower_components/d3/d3.js"></script>
+	<script src="js/app.js"></script>
+	<script>
+		angular.module('RNG', [])
+			.controller('chartController', ['$http','$scope', function($http, $scope){
+				$http.jsonp('http://filltext.com/?rows=10&val={number}&callback=JSON_CALLBACK')
+				.success(function(d) {
+					$scope.data = d;
+				})
+			}])
+			.service('chartService', ['$http', function($http){
+				function getRows() {
+					return $http({
+						method: 'JSONP',
+						url: 'http://filltext.com/?rows=10&val={number}&callback=JSON_CALLBACK'
+					});
+				}
+
+				this.getData = function() {
+					return getRows();
+				};
+
+			}])
+			.directive('reactChart', ['chartService', function(chartService) {
+				return {
+					restrict: 'EA',
+					scope: {
+						data: '=',
+						id: '@'
+					},
+					link: function(scope, elem) {
+						chartService.getData().then(function(response) {
+							scope.data = response.data;
+						});
+
+						scope.$watch('data', function(newData, oldData) {
+							console.log(newData, oldData);
+							React.render(
+								React.createElement(APP, {data: scope.data, target: scope.id}), elem[0]
+							);
+						});
+					}
+				}
+			}])
+	</script>
 </body>
 </html>
